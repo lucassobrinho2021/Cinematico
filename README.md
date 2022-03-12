@@ -10,4 +10,5 @@ na aplicação.
 Não foi possível adicionar fotos no momento.
 
 # Próximos Passos.
+Proteger a chave da api exposta.
 Adicionar fotos, criar descrição dos filmes.
