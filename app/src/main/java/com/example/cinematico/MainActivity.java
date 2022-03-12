@@ -2,9 +2,11 @@ package com.example.cinematico;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -37,8 +39,6 @@ public class MainActivity extends AppCompatActivity {
         final JSONArray[] resultado = new JSONArray[1];
         setContentView(R.layout.activity_main);
 
-
-
         JsonObjectRequest objectRequest = new JsonObjectRequest(
                 Request.Method.GET,
                 URL,
@@ -55,18 +55,20 @@ public class MainActivity extends AppCompatActivity {
                             ArrayList<HashMap<String,String>> listaDeFilmes;
                             listaDeFilmes = new ArrayList<>();
 
-
-
                             for(int i=0; i< resultsArray.length(); i++){
+                                // Pegando resultados da api e alocando os em um objeto que será renderizado pelo listview
                                 JSONObject jsonObject = resultsArray.getJSONObject(i);
-                                Log.println(Log.ASSERT,"Titulo", jsonObject.getString("title"));
-                                Log.println(Log.ASSERT,"Vlaor", String.valueOf(jsonObject.getDouble("vote_average")));
                                 String title = jsonObject.getString("title");
-                                String grade = String.valueOf(jsonObject.getDouble("vote_average"));
+                                String grade = "Nota Média: " + String.valueOf(jsonObject.getDouble("vote_average"));
                                 HashMap<String, String> movies = new HashMap<>();
                                 movies.put("grade", grade);
                                 movies.put("title", title);
                                 listaDeFilmes.add(movies);
+                                //overview
+                                //vote average
+                                //vote count
+                                //release date
+                                //title
                             }
                             ListAdapter adapter = new SimpleAdapter(
                                     MainActivity.this,
@@ -74,8 +76,26 @@ public class MainActivity extends AppCompatActivity {
                                     R.layout.row_layout,
                                     new String[]{"title", "grade"},
                                     new int[]{R.id.textView, R.id.textView2});
-
                             lv.setAdapter(adapter);
+                            lv.setClickable(true);
+                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    Log.d("aqui", "Entrou");
+                                    Intent intention = new Intent(MainActivity.this, MovieActivity.class);
+                                    try {
+                                        intention.putExtra("title", resultsArray.getJSONObject(i).getString("title"));
+                                        intention.putExtra("grade", resultsArray.getJSONObject(i).getString("vote_average"));
+                                        intention.putExtra("vote_count", resultsArray.getJSONObject(i).getString("vote_count"));
+                                        intention.putExtra("overview", resultsArray.getJSONObject(i).getString("overview"));
+                                        startActivity(intention);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                            });
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
